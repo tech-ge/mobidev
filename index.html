@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Development Learning Platform</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --success: #2ecc71;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding-bottom: 2rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: var(--secondary);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .progress-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+        
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            height: 4px;
+            width: 100%;
+            background: #e0e0e0;
+            z-index: 1;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            height: 4px;
+            width: 33%;
+            background: var(--primary);
+            z-index: 2;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-step {
+            width: 40px;
+            height: 40px;
+            background: #e0e0e0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            z-index: 3;
+            transition: all 0.3s ease;
+        }
+        
+        .progress-step.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .step-label {
+            position: absolute;
+            top: 45px;
+            font-size: 0.9rem;
+            color: var(--dark);
+            white-space: nowrap;
+        }
+        
+        .section {
+            display: none;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h2 {
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--light);
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .tool-card {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        
+        .tool-card h3 {
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .tool-card p {
+            color: #555;
+            font-size: 0.95rem;
+        }
+        
+        .design-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+        
+        .design-preview {
+            background: #f8f9fa;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            min-height: 400px;
+        }
+        
+        .code-editor {
+            background: #2d2d2d;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .editor-header {
+            background: #1e1e1e;
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #ccc;
+        }
+        
+        .editor-actions button {
+            background: #3c3c3c;
+            border: none;
+            color: #ccc;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 0.5rem;
+        }
+        
+        .editor-content {
+            padding: 1rem;
+            color: #f8f8f2;
+            font-family: 'Courier New', monospace;
+            min-height: 350px;
+            overflow: auto;
+        }
+        
+        .workspace-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+        
+        .question-area {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+        
+        .question {
+            margin-bottom: 1.5rem;
+        }
+        
+        .question h3 {
+            margin-bottom: 0.8rem;
+            color: var(--secondary);
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .option {
+            padding: 0.8rem;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .option:hover {
+            background: #e9ecef;
+        }
+        
+        .option.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .answer-area {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            min-height: 200px;
+        }
+        
+        .answer-area textarea {
+            width: 100%;
+            height: 150px;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+        
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        button.secondary {
+            background: var(--secondary);
+        }
+        
+        button.secondary:hover {
+            background: #1a252f;
+        }
+        
+        .language-tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .language-tab {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .language-tab.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .code-container {
+            display: none;
+        }
+        
+        .code-container.active {
+            display: block;
+        }
+        
+        .mobile-preview {
+            background: #2c3e50;
+            border-radius: 20px;
+            padding: 20px 10px;
+            width: 300px;
+            margin: 0 auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .mobile-screen {
+            background: white;
+            border-radius: 10px;
+            height: 500px;
+            overflow: auto;
+            padding: 15px;
+        }
+        
+        .mobile-notch {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 20px;
+            background: #2c3e50;
+            border-radius: 0 0 10px 10px;
+        }
+        
+        .result-area {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #e8f4fc;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        @media (max-width: 768px) {
+            .design-area, .workspace-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Mobile Development Learning Platform</h1>
+            <p class="tagline">Master mobile app development through interactive lessons and hands-on practice</p>
+        </header>
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-step active">1</div>
+                <div class="progress-step">2</div>
+                <div class="progress-step">3</div>
+                <div class="step-label" style="left: 0;">Tools & Concepts</div>
+                <div class="step-label" style="left: 50%; transform: translateX(-50%);">Practical Design</div>
+                <div class="step-label" style="right: 0;">Questions & Practice</div>
+            </div>
+        </div>
+        
+        <!-- Section 1: Tools & Concepts -->
+        <section id="section-1" class="section active">
+            <h2>Mobile Development Tools & Concepts</h2>
+            <p>Before building mobile apps, you need to understand the essential tools and platforms. Here are the key components of mobile development:</p>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3>Development Environments</h3>
+                    <p><strong>Android Studio</strong> - Official IDE for Android development</p>
+                    <p><strong>Xcode</strong> - Apple's IDE for iOS/macOS development</p>
+                    <p><strong>VS Code</strong> - Lightweight editor for cross-platform development</p>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>Programming Languages</h3>
+                    <p><strong>Kotlin</strong> - Modern language for Android development</p>
+                    <p><strong>Swift</strong> - Apple's language for iOS development</p>
+                    <p><strong>Dart</strong> - Used with Flutter for cross-platform apps</p>
+                    <p><strong>JavaScript</strong> - For React Native apps</p>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>Frameworks & Platforms</h3>
+                    <p><strong>Flutter</strong> - Google's UI toolkit for natively compiled apps</p>
+                    <p><strong>React Native</strong> - Facebook's framework using React</p>
+                    <p><strong>NativeScript</strong> - Framework for native apps with JavaScript</p>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>UI/UX Design Tools</h3>
+                    <p><strong>Figma</strong> - Collaborative interface design tool</p>
+                    <p><strong>Adobe XD</strong> - Vector-based tool for web and mobile apps</p>
+                    <p><strong>Sketch</strong> - Digital design toolkit for Mac</p>
+                </div>
+            </div>
+            
+            <div class="navigation">
+                <button class="secondary" disabled>Previous</button>
+                <button onclick="showSection(2)">Next: Practical Design</button>
+            </div>
+        </section>
+        
+        <!-- Section 2: Practical Design -->
+        <section id="section-2" class="section">
+            <h2>Practical Design & Implementation</h2>
+            <p>Now let's practice building a simple mobile app interface. Try modifying the code and see the changes in real-time.</p>
+            
+            <div class="design-area">
+                <div class="design-preview">
+                    <h3 style="text-align: center; margin-bottom: 1rem;">Mobile Preview</h3>
+                    <div class="mobile-preview">
+                        <div class="mobile-notch"></div>
+                        <div class="mobile-screen" id="mobile-screen">
+                            <!-- Content will be rendered by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="code-editor">
+                    <div class="editor-header">
+                        <span>app_ui.dart</span>
+                        <div class="editor-actions">
+                            <button onclick="runCode()">Run</button>
+                            <button onclick="resetCode()">Reset</button>
+                        </div>
+                    </div>
+                    
+                    <div class="language-tabs">
+                        <div class="language-tab active" onclick="showLanguage('dart')">Dart (Flutter)</div>
+                        <div class="language-tab" onclick="showLanguage('kotlin')">Kotlin (Android)</div>
+                        <div class="language-tab" onclick="showLanguage('swift')">Swift (iOS)</div>
+                    </div>
+                    
+                    <div class="code-container active" id="dart-code">
+                        <div class="editor-content" contenteditable="true" id="dart-editor">
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('My First App'),
+          backgroundColor: Colors.blue,
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.star, size: 50, color: Colors.amber),
+              SizedBox(height: 20),
+              Text(
+                'Welcome to Flutter!',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {},
+                child: Text('Get Started'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+                        </div>
+                    </div>
+                    
+                    <div class="code-container" id="kotlin-code">
+                        <div class="editor-content" contenteditable="true" id="kotlin-editor">
+package com.example.myfirstapp
+
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.widget.Button
+import android.widget.TextView
+
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        
+        val welcomeText = findViewById<TextView>(R.id.welcomeText)
+        val startButton = findViewById<Button>(R.id.startButton)
+        
+        startButton.setOnClickListener {
+            welcomeText.text = "Hello Android!"
+        }
+    }
+}
+                        </div>
+                    </div>
+                    
+                    <div class="code-container" id="swift-code">
+                        <div class="editor-content" contenteditable="true" id="swift-editor">
+import UIKit
+
+class ViewController: UIViewController {
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        // Create welcome label
+        let welcomeLabel = UILabel()
+        welcomeLabel.text = "Welcome to iOS!"
+        welcomeLabel.textAlignment = .center
+        welcomeLabel.font = UIFont.systemFont(ofSize: 24, weight: .bold)
+        welcomeLabel.frame = CGRect(x: 0, y: 100, width: view.frame.width, height: 50)
+        view.addSubview(welcomeLabel)
+        
+        // Create button
+        let actionButton = UIButton(type: .system)
+        actionButton.setTitle("Tap Me", for: .normal)
+        actionButton.frame = CGRect(x: 50, y: 200, width: view.frame.width - 100, height: 50)
+        actionButton.backgroundColor = .systemBlue
+        actionButton.setTitleColor(.white, for: .normal)
+        actionButton.layer.cornerRadius = 10
+        actionButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        view.addSubview(actionButton)
+    }
+    
+    @objc func buttonTapped() {
+        print("Button was tapped!")
+    }
+}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-area">
+                <h3>Output:</h3>
+                <div id="output-result">No code executed yet. Click "Run" to see the result.</div>
+            </div>
+            
+            <div class="navigation">
+                <button class="secondary" onclick="showSection(1)">Previous: Tools & Concepts</button>
+                <button onclick="showSection(3)">Next: Questions & Practice</button>
+            </div>
+        </section>
+        
+        <!-- Section 3: Questions & Practice -->
+        <section id="section-3" class="section">
+            <h2>Questions & Practice Space</h2>
+            <p>Test your knowledge with these questions and practice your skills in the workspace.</p>
+            
+            <div class="workspace-container">
+                <div class="question-area">
+                    <h3>Multiple Choice Questions</h3>
+                    
+                    <div class="question">
+                        <h3>1. Which programming language is primarily used for Android development?</h3>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this)">Swift</div>
+                            <div class="option" onclick="selectOption(this)">Kotlin</div>
+                            <div class="option" onclick="selectOption(this)">C#</div>
+                            <div class="option" onclick="selectOption(this)">Python</div>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <h3>2. What is the main advantage of using Flutter for mobile development?</h3>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this)">It only works on iOS</div>
+                            <div class="option" onclick="selectOption(this)">It requires separate codebases for iOS and Android</div>
+                            <div class="option" onclick="selectOption(this)">It allows building for both iOS and Android from a single codebase</div>
+                            <div class="option" onclick="selectOption(this)">It doesn't support custom UI components</div>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <h3>3. Which tool is essential for designing mobile app interfaces?</h3>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this)">Android Studio</div>
+                            <div class="option" onclick="selectOption(this)">Figma</div>
+                            <div class="option" onclick="selectOption(this)">Visual Studio Code</div>
+                            <div class="option" onclick="selectOption(this)">Xcode</div>
+                        </div>
+                    </div>
+                    
+                    <button style="width: 100%; margin-top: 1rem;" onclick="checkAnswers()">Check Answers</button>
+                </div>
+                
+                <div class="answer-area">
+                    <h3>Coding Challenge</h3>
+                    <p>Create a simple Flutter app that displays a counter. Each time a button is pressed, the counter should increase by 1.</p>
+                    
+                    <textarea placeholder="Write your code here..."></textarea>
+                    
+                    <button style="margin-top: 1rem;" onclick="submitCode()">Submit Solution</button>
+                    
+                    <div id="feedback" style="margin-top: 1rem; padding: 0.5rem; border-radius: 4px;"></div>
+                </div>
+            </div>
+            
+            <div class="navigation">
+                <button class="secondary" onclick="showSection(2)">Previous: Practical Design</button>
+                <button disabled>Next</button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Section navigation
+        function showSection(sectionNumber) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(`section-${sectionNumber}`).classList.add('active');
+            
+            // Update progress bar
+            const progressSteps = document.querySelectorAll('.progress-step');
+            progressSteps.forEach((step, index) => {
+                if (index < sectionNumber) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+            
+            // Update progress bar line
+            const progressBar = document.querySelector('.progress-bar');
+            const progressPercentage = (sectionNumber - 1) / 2 * 100;
+            progressBar.style.setProperty('--progress', `${progressPercentage}%`);
+            
+            // Update the ::after pseudo-element width
+            const progressAfter = progressBar;
+            progressAfter.style.setProperty('--progress-width', `${(sectionNumber - 1) * 33}%`);
+        }
+        
+        // Language tabs
+        function showLanguage(language) {
+            // Update active tab
+            document.querySelectorAll('.language-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show corresponding code editor
+            document.querySelectorAll('.code-container').forEach(container => {
+                container.classList.remove('active');
+            });
+            document.getElementById(`${language}-code`).classList.add('active');
+        }
+        
+        // Run code simulation
+        function runCode() {
+            const outputElement = document.getElementById('output-result');
+            outputElement.innerHTML = `
+                <div style="color: green; font-weight: bold;">✓ Code compiled successfully!</div>
+                <div style="margin-top: 10px;">App is running in the preview area.</div>
+            `;
+            
+            // Simple simulation of code rendering in mobile preview
+            const mobileScreen = document.getElementById('mobile-screen');
+            mobileScreen.innerHTML = `
+                <div style="background: #2196F3; color: white; padding: 15px; text-align: center; border-radius: 5px;">
+                    <h3>My First App</h3>
+                </div>
+                <div style="text-align: center; padding: 40px 0;">
+                    <div style="font-size: 40px; color: #FFC107;">★</div>
+                    <h2 style="margin: 20px 0;">Welcome to Flutter!</h2>
+                    <button style="background: #2196F3; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold;">
+                        Get Started
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Reset code
+        function resetCode() {
+            document.getElementById('output-result').innerHTML = 'No code executed yet. Click "Run" to see the result.';
+            document.getElementById('mobile-screen').innerHTML = '';
+        }
+        
+        // Multiple choice selection
+        function selectOption(option) {
+            // Remove selected class from all options in this question
+            const options = option.parentElement.querySelectorAll('.option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            // Add selected class to clicked option
+            option.classList.add('selected');
+        }
+        
+        // Check answers
+        function checkAnswers() {
+            const questions = document.querySelectorAll('.question');
+            let correctAnswers = 0;
+            
+            // Question 1 - Kotlin is correct
+            if (questions[0].querySelectorAll('.option')[1].classList.contains('selected')) {
+                correctAnswers++;
+            }
+            
+            // Question 2 - Single codebase is correct
+            if (questions[1].querySelectorAll('.option')[2].classList.contains('selected')) {
+                correctAnswers++;
+            }
+            
+            // Question 3 - Figma is correct
+            if (questions[2].querySelectorAll('.option')[1].classList.contains('selected')) {
+                correctAnswers++;
+            }
+            
+            alert(`You got ${correctAnswers} out of ${questions.length} correct!`);
+        }
+        
+        // Submit code solution
+        function submitCode() {
+            const feedbackElement = document.getElementById('feedback');
+            feedbackElement.innerHTML = `
+                <div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 4px;">
+                    <strong>Good attempt!</strong> Your solution has been submitted. Here's a sample solution:
+                    <pre style="background: #f8f9fa; padding: 10px; margin-top: 10px; border-radius: 4px; overflow: auto;">
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: CounterApp(),
+    );
+  }
+}
+
+class CounterApp extends StatefulWidget {
+  @override
+  _CounterAppState createState() => _CounterAppState();
+}
+
+class _CounterAppState extends State<CounterApp> {
+  int _counter = 0;
+
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Counter App')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('You have pushed the button this many times:'),
+            Text('$_counter', style: TextStyle(fontSize: 40)),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+}
+                    </pre>
+                </div>
+            `;
+        }
+        
+        // Initialize the page with some content
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up CSS for progress bar
+            const style = document.createElement('style');
+            style.textContent = `
+                .progress-bar::after {
+                    width: calc(33% * var(--progress-width, 0));
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>
